@@ -1,0 +1,30 @@
+{
+	"manifest_version": 2,
+
+	"name": "Sensitive Account Manager",
+	"short_name": "SAM",
+	"description": "This is SAM",
+	"version": "1.0.0",
+
+	"browser_action": {
+		"default_icon": "icon.png",
+		"default_popup": "sam.html"
+	},
+	
+	"permissions": [
+		"activeTab",
+		"contentSettings",
+		"background"
+	],
+	
+	"background": { "scripts": [ "sam_background.js" ] },
+
+	"content_scripts": [
+	{
+		"matches": [ "<all_urls>" ],
+		"js": ["jq.js", "sam.js"],
+		"run_at": "document_idle"
+	}
+	]
+	
+}

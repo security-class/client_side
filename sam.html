@@ -1,0 +1,36 @@
+ <!-- SAM created by Wesley Powell Painter, Sydney Schweber and Omer Solmazer. -->
+
+<!doctype html>
+<html>
+<head>
+  <title>SAM</title>
+  <style>
+  table, th, td {
+    border: 1px solid black;
+  }
+  body {
+    font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+    font-size: 100%;
+    width:400px;
+  }
+  </style>
+</head>
+<body>
+  <div id="sam_login_div">
+    Username:<br>
+    <input type="text" id="sam_user_name"><br>
+    Password:<br>
+    <input type="password" id="sam_password"><br>
+    <button type="submit" id="sam_login">Login</button>
+    <p id="demo">=0</p>
+    <script src="jquery.js"></script>
+    <script src="sam.js"></script>
+  </div>
+  <div id="sam_pws_div" hidden="true">
+    Here's the list!
+    <table id = "sam_pws_table">
+      
+    </table>
+  </div>
+</body>
+</html>
