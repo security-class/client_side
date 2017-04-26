@@ -14,10 +14,15 @@
 	"permissions": [
 		"activeTab",
 		"contentSettings",
-		"background"
+		"background",
+		"storage",
+		"clipboardWrite"
 	],
 	
-	"background": { "scripts": [ "sam_background.js" ] },
+	"background": { "scripts": [ 
+		"CryptoJS/rollups/aes.js",
+		"sam_background.js" 
+	] },
 
 	"content_scripts": [
 	{

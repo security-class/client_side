@@ -1,36 +1,45 @@
  <!-- SAM created by Wesley Powell Painter, Sydney Schweber and Omer Solmazer. -->
 
-<!doctype html>
-<html>
-<head>
+ <!doctype html>
+ <html>
+ <head>
   <title>SAM</title>
   <style>
   table, th, td {
     border: 1px solid black;
   }
   body {
-    font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+    font-family: "Arial", "Helvetica", sans-serif;
     font-size: 100%;
-    width:400px;
+    width:600px;
   }
   </style>
 </head>
 <body>
   <div id="sam_login_div">
     Username:<br>
-    <input type="text" id="sam_user_name"><br>
+    <input type="text" id="sam_username"><br>
     Password:<br>
     <input type="password" id="sam_password"><br>
     <button type="submit" id="sam_login">Login</button>
-    <p id="demo">=0</p>
     <script src="jquery.js"></script>
     <script src="sam.js"></script>
   </div>
+  <font color = "red" hidden="true" id="sam_err_msg">Incorrect username or password!</font>
   <div id="sam_pws_div" hidden="true">
     Here's the list!
     <table id = "sam_pws_table">
-      
     </table>
+    <br>
+    <button type="submit" id="sam_gen_data">Generate new username & password</button>
+    <div id="sam_new_creds" hidden="true">
+      <br>
+      Username: 
+      <font id="sam_new_username"></font><button id="sam_username_copy" style="float: right;">Copy</button>
+      <br><br>
+      Password: 
+      <font id="sam_new_password"></font><button id="sam_password_copy" style="float: right;">Copy</button>
+    </div>
   </div>
 </body>
 </html>
