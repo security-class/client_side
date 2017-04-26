@@ -7,8 +7,8 @@ var upper_case = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M
 var punctuation= ['!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', '[', ']', '?', '_', '-', '@']
 var digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 var background_page = chrome.extension.getBackgroundPage();
-console.log(background_page);
 
+// Helper post function
 function send_request(type, url, data, success_callback, error_callback) {
   $.ajax({
     type : type,
@@ -27,15 +27,20 @@ function send_request(type, url, data, success_callback, error_callback) {
   }); 
 }
 
+// Fired upon user clicking on login button, if they are not already logged in.
 function login() {
   var username = document.getElementById('sam_username').value;
   var pw = document.getElementById('sam_password').value;
+  // TODO: update url once server is up
   var url = 'TBD';
-  var data = {'creds':[
-  { 'username' : "-Nnz5$]0", "pw" : "nr70jR38a6@b!8%/", 'domain' : 'facebook' },
-  { 'username' : "[D!t4Eae", "pw" : "l8i2G20dgx2f0/Gb", 'domain' : 'google' },
-  { 'username' : "oo1Q4)U6", "pw" : "60/cHQI2+65-OY6(", 'domain' : 'twitter' }
-  ]};
+  background_page.set_login('secret_token');
+  
+
+  // var data = {'creds':[
+  // { 'username' : "-Nnz5$]0", "pw" : "nr70jR38a6@b!8%/", 'domain' : 'facebook' },
+  // { 'username' : "[D!t4Eae", "pw" : "l8i2G20dgx2f0/Gb", 'domain' : 'google' },
+  // { 'username' : "oo1Q4)U6", "pw" : "60/cHQI2+65-OY6(", 'domain' : 'twitter' }
+  // ]};
   // send_request('POST', 'http://nyu-devops-s17-inventory.mybluemix.net/inventory/products', 
   //   JSON.stringify({ 'username': 'user', 'password': 'pass', }), 
   //   function(data) {
@@ -44,9 +49,9 @@ function login() {
   //   function(status, error) { 
   //     console.log(error);
       
-  //     // background_page.save_vault(data, function(){
+      // background_page.save_vault(data, function(){
         
-  //     // });
+      // });
       
   //     background_page.get_vault(function(data){
   //       populate_table('sam_pws_table', data);
@@ -54,24 +59,29 @@ function login() {
   //     // document.getElementById('sam_err_msg').hidden = false;
   //   }
   //   );
-  // background_page.save_vault(data, function(){});
 
   background_page.get_vault(function(data){
     populate_table('sam_pws_table', data);
   });
 }
 
+// Generate new username and password pair.
+// Will be updated to include options for different groups and lengths
+// TODO 
 function generate_creds() {
   document.getElementById('sam_new_creds').hidden = false;
   var username_box = document.getElementById('sam_new_username');
   var pw_box = document.getElementById('sam_new_password');
-  var name = gen_rand_seq(8);
-  var pw = gen_rand_seq(16);
+  var name = gen_rand_seq(8, true, true);
+  var pw = gen_rand_seq(16, true, true);
   username_box.innerHTML = name;
   pw_box.innerHTML = pw;
 }
 
-function gen_rand_seq(limit) {
+// Generating random sequence from the character groups
+// Will be updated to use inclusion flags
+// TODO
+function gen_rand_seq(limit, include_punc, include_dig) {
   var r = "";
   // Populate the string
   for (var i = 0; i < limit; i++) {
@@ -120,16 +130,16 @@ function gen_rand_seq(limit) {
   // Only pass if all exist
   var is_valid = low && up && punc && dig;
   if(!is_valid){
-    r = gen_rand_seq(limit);
+    r = gen_rand_seq(limit, include_punc, include_dig);
   }
   return r;
 }
 
+// Print out usernames and passwords as a table
 function populate_table(table_name, data) {
   document.getElementById('sam_login_div').hidden = true;
   document.getElementById('sam_pws_div').hidden = false;
-  var table = document.getElementById(table_name)
-  table.hidden = false;
+  document.getElementById(table_name).hidden = false;
 
   var list = data['creds'];
   var t = new Array(), j = -1;
@@ -157,6 +167,7 @@ function populate_table(table_name, data) {
   }
 }
 
+// Copy the given text to the clipboard
 function copy_to_clipboard(text) {
   const input = document.createElement('input');
   input.style.position = 'fixed';
@@ -168,6 +179,7 @@ function copy_to_clipboard(text) {
   document.body.removeChild(input);
 };
 
+// Save the generated username and password (assumption: if copied, it is used) while copying username to clipboard
 function copy_username() {
   copy_to_clipboard(document.getElementById('sam_new_username').innerHTML);
   var un = document.getElementById('sam_new_username').innerHTML;
@@ -179,9 +191,10 @@ function copy_username() {
     background_page.add_to_vault(data, function(data){
       populate_table('sam_pws_table', data);
     });
-  })
+  });
 }
 
+// Save the generated username and password (assumption: if copied, it is used) while copying the password to clipboard
 function copy_password() {
   copy_to_clipboard(document.getElementById('sam_new_password').innerHTML);
   var un = document.getElementById('sam_new_username').innerHTML;
@@ -190,12 +203,26 @@ function copy_password() {
     var url = new URL(tab.url);
     var domain = url.hostname;
     var data = { 'domain' : domain, 'username' : un, 'pw' : pw };
-    background_page.add_to_vault(data);
-  })
+    background_page.add_to_vault(data, function(data){
+      populate_table('sam_pws_table', data);
+    });
+  });
 }
 
+// Add event listeners and button onclick functions to the HTML elements.
 document.addEventListener('DOMContentLoaded', function() {
   $(document).ready(function(){
+    background_page.check_login(function(cookie_value){
+      if(cookie_value) {
+        background_page.get_vault(function(data) {
+          populate_table('sam_pws_table', data );
+        });
+      }
+      else {
+        console.log('not logged in');
+      }
+    });
+    
     document.getElementById('sam_login').onclick = login;
     document.getElementById('sam_gen_data').onclick = generate_creds;
     document.getElementById('sam_username_copy').onclick = copy_username;

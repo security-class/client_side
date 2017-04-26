@@ -16,7 +16,9 @@
 		"contentSettings",
 		"background",
 		"storage",
-		"clipboardWrite"
+		"clipboardWrite",
+		"cookies",
+		"<all_urls>"
 	],
 	
 	"background": { "scripts": [ 
