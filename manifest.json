@@ -23,6 +23,10 @@
 	
 	"background": { "scripts": [ 
 		"CryptoJS/rollups/aes.js",
+		"jq.js",
+		"jsbn-min.js",
+		"base64-min.js",
+		"base64x-1.1.min.js",
 		"sam_background.js" 
 	] },
 

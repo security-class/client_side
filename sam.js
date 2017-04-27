@@ -2,64 +2,27 @@
 // $.get(chrome.extension.getURL("sam.html"), {}, function(data) {$('body').append(data);}, 'html');
 // chrome.extension.sendRequest({}, function(response) {});
 
-var lower_case = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-var upper_case = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-var punctuation= ['!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', '[', ']', '?', '_', '-', '@']
-var digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+var lower_case = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ]
+var upper_case = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' ]
+var punctuation= ['!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', '[', ']', '?', '_', '-', '@', '{', '}', '^', '=', ';' ]
+var digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ]
 var background_page = chrome.extension.getBackgroundPage();
 
-// Helper post function
-function send_request(type, url, data, success_callback, error_callback) {
-  $.ajax({
-    type : type,
-    url : url,
-    dataType: "text",
-    contentType: "application/json; charset=utf-8",
-    data : JSON.stringify(data),
+// Sample vault data: 
 
-    success: function(msg){
-      success_callback(msg);
-    },
+// var sample_vault_data = [
+// { "username" : "-Nnz5$]0", "password" : "nr70jR38a6@b!8%/", "domain" : 'facebook' },
+// { "username" : "[D!t4Eae", "password" : "l8i2G20dgx2f0/Gb", "domain" : 'google' },
+// { "username" : "oo1Q4)U6", "password" : "60/cHQI2+65-OY6(", "domain" : 'twitter' }
+// ];
 
-    error: function (textStatus, errorThrown) {
-      error_callback(textStatus, errorThrown);
-    }
-  }); 
-}
 
 // Fired upon user clicking on login button, if they are not already logged in.
 function login() {
+  // background_page.save_vault(sample_vault_data, function(){});
   var username = document.getElementById('sam_username').value;
   var pw = document.getElementById('sam_password').value;
-  // TODO: update url once server is up
-  var url = 'TBD';
-  background_page.set_login('secret_token');
-  
-
-  // var data = {'creds':[
-  // { 'username' : "-Nnz5$]0", "pw" : "nr70jR38a6@b!8%/", 'domain' : 'facebook' },
-  // { 'username' : "[D!t4Eae", "pw" : "l8i2G20dgx2f0/Gb", 'domain' : 'google' },
-  // { 'username' : "oo1Q4)U6", "pw" : "60/cHQI2+65-OY6(", 'domain' : 'twitter' }
-  // ]};
-  // send_request('POST', 'http://nyu-devops-s17-inventory.mybluemix.net/inventory/products', 
-  //   JSON.stringify({ 'username': 'user', 'password': 'pass', }), 
-  //   function(data) {
-  //     populate_table('sam_pws_table', data);
-  //   },
-  //   function(status, error) { 
-  //     console.log(error);
-      
-      // background_page.save_vault(data, function(){
-        
-      // });
-      
-  //     background_page.get_vault(function(data){
-  //       populate_table('sam_pws_table', data);
-  //     });
-  //     // document.getElementById('sam_err_msg').hidden = false;
-  //   }
-  //   );
-
+  background_page.login(username, pw);
   background_page.get_vault(function(data){
     populate_table('sam_pws_table', data);
   });
@@ -135,36 +98,47 @@ function gen_rand_seq(limit, include_punc, include_dig) {
   return r;
 }
 
-// Print out usernames and passwords as a table
+// Print out usernames and passwords as a table. Add edit button. Instead of edit how about add custom pw?
+// TODO
 function populate_table(table_name, data) {
   document.getElementById('sam_login_div').hidden = true;
   document.getElementById('sam_pws_div').hidden = false;
   document.getElementById(table_name).hidden = false;
 
-  var list = data['creds'];
   var t = new Array(), j = -1;
-  t[++j] = '<tr><th>Domain</th><th>User Name</th><th>Password</th></tr>';
+  t[++j] = '<tr><th>Domain</th><th>User Name</th><th>Password</th><th style="color:red">Remove</th></tr>';
 
-  for (var i = 0; i < list.length; i++) {
+  for (var i = 0; i < data.length; i++) {
     t[++j] ='<tr><td>';
-    t[++j] = list[i]['domain'];
+    t[++j] = data[i]['domain'];
     t[++j] = '</td><td>';
-    t[++j] = list[i]['username'];
-    t[++j] = '<button id="table_username'+i+'"style="float: right;" value="'+list[i]['username']+'">Copy</button>';
+    t[++j] = data[i]['username'];
+    t[++j] = '<button id="table_username'+i+'"style="float: right;" value="'+data[i]['username']+'">Copy</button>';
     t[++j] = '</td><td>';
-    t[++j] = list[i]['pw'];
-    t[++j] = '<button id="table_password'+i+'"style="float: right;" value="'+list[i]['pw']+'">Copy</button>';
+    t[++j] = data[i]['password'];
+    t[++j] = '<button id="table_password'+i+'"style="float: right;" value="'+data[i]['password']+'">Copy</button>';
+    t[++j] = '</td><td>';
+    t[++j] = '<button id="table_remove'+i+'"style="float: right; color:red " value="'+data[i]['domain']+'">Remove</button>';
     t[++j] = '</td></tr>';
   }
   $('#sam_pws_table').html(t.join(''));
-  for (var i = 0, k = 0; i < list.length; i++) {
+  for (var i = 0, k = 0; i < data.length; i++) {
     document.getElementById('table_username'+i).addEventListener('click', function() {
       copy_to_clipboard(this.value);
     }, false);
     document.getElementById('table_password'+i).addEventListener('click', function() {
       copy_to_clipboard(this.value);
     }, false);
+    document.getElementById('table_remove'+i).addEventListener('click', function() {
+      remove_domain(this.value);
+    }, false);
   }
+}
+
+function remove_domain(domain) {
+  background_page.remove_from_vault(domain, function(new_vault) {
+    populate_table('sam_pws_table', new_vault);
+  });
 }
 
 // Copy the given text to the clipboard
@@ -187,7 +161,7 @@ function copy_username() {
   chrome.tabs.getSelected(null, function (tab) {
     var url = new URL(tab.url);
     var domain = url.hostname;
-    var data = { 'domain' : domain, 'username' : un, 'pw' : pw };
+    var data = { 'domain' : domain, 'username' : un, 'password' : pw };
     background_page.add_to_vault(data, function(data){
       populate_table('sam_pws_table', data);
     });
@@ -202,7 +176,7 @@ function copy_password() {
   chrome.tabs.getSelected(null, function (tab) {
     var url = new URL(tab.url);
     var domain = url.hostname;
-    var data = { 'domain' : domain, 'username' : un, 'pw' : pw };
+    var data = { 'domain' : domain, 'username' : un, 'password' : pw };
     background_page.add_to_vault(data, function(data){
       populate_table('sam_pws_table', data);
     });
