@@ -1,22 +1,10 @@
-
-// chrome.extension.onRequest.addListener(
-// 	function(request, sender, sendResponse) {
-// 		chrome.pageAction.show(sender.tab.id);
-// 		sendResponse({});
-// 	}
-// );
+// SAM created by Wesley Powell Painter, Sydney Schweber and Omer Solmazer.
 
 var sam_cookie_url = "https://pcs-sam.mybluemix.net/";
 var url_base_auth = 'https://pcs-sam-auth.mybluemix.net/';
 var url_base_vault = 'https://pcs-sam-vault.mybluemix.net/';
 var token = ' ';
 var uid = -1;
-
-// Check if the user logged in. Currently only checks if the cookie exists, later will send request to server for making sure the token is still valid.
-// TODO
-// Post for getting auth: auth/token/
-// Get user vault: /vault/<id>
-// 
 
 // Helper post function
 function send_request(type, url, d, success_callback, error_callback) {
